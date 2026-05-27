@@ -536,11 +536,12 @@ async function saveCli(){
     console.log('Enviando cliente:', d);
 
     const { data, error } = await supabaseClient
-      .from('Clientes')
-      .insert([d]);
+  .from('Clientes')
+  .insert([d])
+  .select();
 
-    console.log('Resposta Supabase:', data);
-    console.log('Erro:', error);
+console.log('Resposta Supabase:', data);
+console.log('Erro:', error);
 
     if(error){
       alert('Erro ao salvar cliente');
