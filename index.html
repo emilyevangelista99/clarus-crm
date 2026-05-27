@@ -510,40 +510,51 @@ function renderCli(){
 }
 async function saveCli(){
 
-  var nome=document.getElementById('cli-nome').value.trim();
+  try {
 
-  if(!nome){
-    alert('Informe o nome do cliente.');
-    return;
+    var nome=document.getElementById('cli-nome').value.trim();
+
+    if(!nome){
+      alert('Informe o nome do cliente.');
+      return;
+    }
+
+    var svcIds=Array.from(document.querySelectorAll('.sck:checked'))
+      .map(function(c){return c.value;});
+
+    var d={
+      nome:nome,
+      telefone:document.getElementById('cli-wp').value.trim(),
+      empresa:document.getElementById('cli-doc').value.trim(),
+      email:document.getElementById('cli-email').value.trim(),
+      segmento:document.getElementById('cli-seg').value.trim(),
+      status:document.getElementById('cli-st').value,
+      observacoes:document.getElementById('cli-obs').value.trim(),
+      servicos:svcIds.join(', ')
+    };
+
+    console.log('Enviando cliente:', d);
+
+    const { data, error } = await supabaseClient
+      .from('clientes')
+      .insert([d]);
+
+    console.log('Resposta Supabase:', data);
+    console.log('Erro:', error);
+
+    if(error){
+      alert('Erro ao salvar cliente');
+      console.error(error);
+      return;
+    }
+
+    alert('Cliente salvo com sucesso!');
+
+    closeMdl('mdl-cli');
+
+  } catch(e){
+    console.error('ERRO GERAL:', e);
   }
-
-  var svcIds=Array.from(document.querySelectorAll('.sck:checked'))
-    .map(function(c){return c.value;});
-
-  var d={
-    nome:nome,
-    telefone:document.getElementById('cli-wp').value.trim(),
-    empresa:document.getElementById('cli-doc').value.trim(),
-    email:document.getElementById('cli-email').value.trim(),
-    segmento:document.getElementById('cli-seg').value.trim(),
-    status:document.getElementById('cli-st').value,
-    observacoes:document.getElementById('cli-obs').value.trim(),
-    servicos:svcIds.join(', ')
-  };
-
-  const { data, error } = await supabaseClient
-    .from('clientes')
-    .insert([d]);
-
-  if(error){
-    console.error(error);
-    alert('Erro ao salvar cliente');
-    return;
-  }
-
-  alert('Cliente salvo com sucesso!');
-
-  closeMdl('mdl-cli');
 }
 function editCli2(id){
   var c=clientes.find(function(x){return x.id===id;});if(!c)return;
