@@ -536,7 +536,7 @@ async function saveCli(){
     console.log('Enviando cliente:', d);
 
     const { data, error } = await supabaseClient
-      .from('clientes')
+      .from('cliente')
       .insert([d]);
 
     console.log('Resposta Supabase:', data);
