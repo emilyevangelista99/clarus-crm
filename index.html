@@ -508,14 +508,42 @@ function renderCli(){
     return '<tr><td><div style="display:flex;align-items:center;gap:9px;"><div class="av">'+ini(c.nome)+'</div><div><div style="font-weight:500;">'+esc(c.nome)+'</div><div style="font-size:11px;color:var(--text2);">'+esc(c.seg||'')+'</div></div></div></td><td><div>'+esc(c.wp||'-')+'</div><div style="font-size:11px;color:var(--text2);">'+esc(c.email||'')+'</div></td><td style="font-size:12px;color:var(--text2);">'+esc(c.doc||'-')+'</td><td>'+(tags||'-')+'</td><td>'+(c.status==='ativo'?'<span class="bdg bg">Ativo</span>':'<span class="bdg bgy">Inativo</span>')+'</td><td><div style="display:flex;gap:4px;"><button class="ib" title="Editar" data-action="editCli" data-id="'+c.id+'">'+icoEd+'</button><button class="ib" title="Excluir" data-action="delCli" data-id="'+c.id+'">'+icoTr+'</button></div></td></tr>';
   }).join(''):'<tr><td colspan="6"><div class="emp">Nenhum cliente. Clique em Novo cliente.</div></td></tr>';
 }
-function saveCli(){
+async function saveCli(){
+
   var nome=document.getElementById('cli-nome').value.trim();
-  if(!nome){alert('Informe o nome do cliente.');return;}
-  var svcIds=Array.from(document.querySelectorAll('.sck:checked')).map(function(c){return c.value;});
-  var d={nome:nome,doc:document.getElementById('cli-doc').value.trim(),wp:document.getElementById('cli-wp').value.trim(),email:document.getElementById('cli-email').value.trim(),seg:document.getElementById('cli-seg').value.trim(),status:document.getElementById('cli-st').value,obs:document.getElementById('cli-obs').value.trim(),svcIds:svcIds};
-  if(editCli){var i=clientes.findIndex(function(c){return c.id===editCli;});if(i>-1)clientes[i]=Object.assign({},clientes[i],d);}
-  else clientes.push(Object.assign({id:uid(),criado:today()},d));
-  save();closeMdl('mdl-cli');renderCli();renderDash();
+
+  if(!nome){
+    alert('Informe o nome do cliente.');
+    return;
+  }
+
+  var svcIds=Array.from(document.querySelectorAll('.sck:checked'))
+    .map(function(c){return c.value;});
+
+  var d={
+    nome:nome,
+    telefone:document.getElementById('cli-wp').value.trim(),
+    empresa:document.getElementById('cli-doc').value.trim(),
+    email:document.getElementById('cli-email').value.trim(),
+    segmento:document.getElementById('cli-seg').value.trim(),
+    status:document.getElementById('cli-st').value,
+    observacoes:document.getElementById('cli-obs').value.trim(),
+    servicos:svcIds.join(', ')
+  };
+
+  const { data, error } = await supabaseClient
+    .from('clientes')
+    .insert([d]);
+
+  if(error){
+    console.error(error);
+    alert('Erro ao salvar cliente');
+    return;
+  }
+
+  alert('Cliente salvo com sucesso!');
+
+  closeMdl('mdl-cli');
 }
 function editCli2(id){
   var c=clientes.find(function(x){return x.id===id;});if(!c)return;
