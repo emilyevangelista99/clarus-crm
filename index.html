@@ -407,6 +407,20 @@ svg.ico-lg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = 'https://zgiillutiuikfignqell.supabase.co'
+const supabaseKey = 'sb_publishable_5b-I_WEohVwaPGI_r95TFw_2e93eFrA'
+
+const supabaseClient = window.supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+)
+
+console.log('Supabase conectado!')
+</script>
+
 <script>
 // =========================================================
 // DADOS
@@ -415,53 +429,44 @@ var clientes=[], servicos=[], pagamentos=[];
 var editCli=null, editSvc=null, confPagId=null, recType='mensal';
 
 async function load(){
+  // CLIENTES: carrega do Supabase
   try {
     const { data: clientesData, error: clientesError } = await supabaseClient
       .from('Clientes')
-      .select('*');
+      .select('*')
+      .order('nome', { ascending: true });
 
     if (clientesError) throw clientesError;
 
-    clientes = clientesData.map(c => ({
-      id: c.id,
-      nome: c.nome,
-      wp: c.telefone,
-      doc: c.empresa,
-      email: c.email,
-      seg: c.segmento,
-      status: c.status,
-      obs: c.observacoes,
-      svcIds: c.servicos ? c.servicos.split(', ') : []
-    }));
-
+    clientes = (clientesData || []).map(function(c){
+      return {
+        id: c.id,
+        nome: c.nome || '',
+        wp: c.telefone || '',
+        doc: c.empresa || '',
+        email: c.email || '',
+        seg: c.segmento || '',
+        status: c.status || 'ativo',
+        obs: c.observacoes || '',
+        svcIds: c.servicos ? String(c.servicos).split(', ').filter(Boolean) : []
+      };
+    });
   } catch(e) {
-    console.error('Erro ao carregar clientes:', e);
+    console.error('Erro ao carregar clientes do Supabase:', e);
     clientes = [];
   }
 
+  // SERVIÇOS: mantém a lógica original em localStorage para não quebrar o sistema
   try {
-    const { data: servicosData, error: servicosError } = await supabaseClient
-      .from('Servicos')
-      .select('*');
-
-    if (servicosError) throw servicosError;
-
-    servicos = servicosData || [];
-
+    servicos = JSON.parse(localStorage.getItem('clarus_servicos') || '[]');
   } catch(e) {
     console.error('Erro ao carregar serviços:', e);
     servicos = [];
   }
 
+  // PAGAMENTOS: mantém a lógica original em localStorage para não quebrar o sistema
   try {
-    const { data: pagamentosData, error: pagamentosError } = await supabaseClient
-      .from('Pagamentos')
-      .select('*');
-
-    if (pagamentosError) throw pagamentosError;
-
-    pagamentos = pagamentosData || [];
-
+    pagamentos = JSON.parse(localStorage.getItem('clarus_pagamentos') || '[]');
   } catch(e) {
     console.error('Erro ao carregar pagamentos:', e);
     pagamentos = [];
@@ -469,9 +474,8 @@ async function load(){
 
   renderCli();
   renderSvc();
-  renderPay();
+  renderPag();
   renderDash();
-}
 }
 function save(){
   localStorage.setItem('clarus_clientes',JSON.stringify(clientes));
@@ -563,18 +567,11 @@ function renderCli(){
   }).join(''):'<tr><td colspan="6"><div class="emp">Nenhum cliente. Clique em Novo cliente.</div></td></tr>';
 }
 async function saveCli(){
-
   try {
-
     var nome=document.getElementById('cli-nome').value.trim();
+    if(!nome){alert('Informe o nome do cliente.');return;}
 
-    if(!nome){
-      alert('Informe o nome do cliente.');
-      return;
-    }
-
-    var svcIds=Array.from(document.querySelectorAll('.sck:checked'))
-      .map(function(c){return c.value;});
+    var svcIds=Array.from(document.querySelectorAll('.sck:checked')).map(function(c){return c.value;});
 
     var d={
       nome:nome,
@@ -589,40 +586,55 @@ async function saveCli(){
 
     console.log('Enviando cliente:', d);
 
- const { data, error } = await supabaseClient
-  .from('Clientes')
-  .insert([d])
-  .select('*')
-  .single();
-
-console.log('Resposta Supabase:', data);
-console.log('Erro:', error);
-
-    if(error){
-      alert('Erro ao salvar cliente');
-      console.error(error);
-      return;
+    var result;
+    if(editCli){
+      result = await supabaseClient
+        .from('Clientes')
+        .update(d)
+        .eq('id', editCli)
+        .select('*')
+        .single();
+    } else {
+      result = await supabaseClient
+        .from('Clientes')
+        .insert([d])
+        .select('*')
+        .single();
     }
 
-   clientes.push({
-  id: data.id,
-  nome: data.nome,
-  wp: data.telefone,
-  doc: data.empresa,
-  email: data.email,
-  seg: data.segmento,
-  status: data.status,
-  obs: data.observacoes,
-  svcIds: data.servicos ? data.servicos.split(', ') : []
-});
+    var data = result.data;
+    var error = result.error;
 
-renderCli();
-renderDash();
+    console.log('Resposta Supabase:', data);
+    console.log('Erro:', error);
 
-closeMdl('mdl-cli');
+    if(error){alert('Erro ao salvar cliente');console.error(error);return;}
 
+    var clienteTela = {
+      id: data.id,
+      nome: data.nome || '',
+      wp: data.telefone || '',
+      doc: data.empresa || '',
+      email: data.email || '',
+      seg: data.segmento || '',
+      status: data.status || 'ativo',
+      obs: data.observacoes || '',
+      svcIds: data.servicos ? String(data.servicos).split(', ').filter(Boolean) : []
+    };
+
+    if(editCli){
+      var i=clientes.findIndex(function(c){return c.id===editCli;});
+      if(i>-1) clientes[i]=clienteTela;
+    } else {
+      clientes.push(clienteTela);
+    }
+
+    renderCli();
+    renderDash();
+    closeMdl('mdl-cli');
   } catch(e){
     console.error('ERRO GERAL:', e);
+    alert('Erro geral ao salvar cliente. Veja o console.');
   }
 }
 function editCli2(id){
@@ -634,7 +646,22 @@ function editCli2(id){
   setTimeout(function(){(c.svcIds||[]).forEach(function(sid){var cb=document.querySelector('.sck[value="'+sid+'"]');if(cb)cb.checked=true;});},60);
   openMdl('mdl-cli');
 }
-function delCli(id){if(!confirm('Excluir este cliente?'))return;clientes=clientes.filter(function(c){return c.id!==id;});save();renderCli();renderDash();}
+async function delCli(id){
+  if(!confirm('Excluir este cliente?'))return;
+  try{
+    const { error } = await supabaseClient
+      .from('Clientes')
+      .delete()
+      .eq('id', id);
+    if(error){alert('Erro ao excluir cliente');console.error(error);return;}
+    clientes=clientes.filter(function(c){return c.id!==id;});
+    renderCli();
+    renderDash();
+  }catch(e){
+    console.error('ERRO AO EXCLUIR CLIENTE:', e);
+    alert('Erro geral ao excluir cliente. Veja o console.');
+  }
+}
 
 // =========================================================
 // SERVIÇOS
@@ -1053,22 +1080,11 @@ function abrirBackupModal() {
   openMdl('mdl-backup');
 }
 
-load();seed();renderDash();
+document.addEventListener('DOMContentLoaded', function(){
+  load();
+  seed();
+  renderDash();
+});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabaseUrl = 'https://zgiillutiuikfignqell.supabase.co'
-const supabaseKey = 'sb_publishable_5b-I_WEohVwaPGI_r95TFw_2e93eFrA'
-
-const supabaseClient = window.supabase.createClient(
-  supabaseUrl,
-  supabaseKey
-)
-
-console.log('Supabase conectado!')
-</script>
-</body>
-</html>
 </body>
 </html>
