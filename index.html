@@ -550,7 +550,22 @@ console.log('Erro:', error);
       return;
     }
 
-    alert('Cliente salvo com sucesso!');
+   clientes.push({
+  id: data.id,
+  nome: data.nome,
+  wp: data.telefone,
+  doc: data.empresa,
+  email: data.email,
+  seg: data.segmento,
+  status: data.status,
+  obs: data.observacoes,
+  svcIds: data.servicos ? data.servicos.split(', ') : []
+});
+
+renderCli();
+renderDash();
+
+closeMdl('mdl-cli');
 
     closeMdl('mdl-cli');
 
