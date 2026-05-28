@@ -414,10 +414,64 @@ svg.ico-lg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7
 var clientes=[], servicos=[], pagamentos=[];
 var editCli=null, editSvc=null, confPagId=null, recType='mensal';
 
-function load(){
-  try{clientes=JSON.parse(localStorage.getItem('clarus_clientes')||'[]');}catch(e){clientes=[];}
-  try{servicos=JSON.parse(localStorage.getItem('clarus_servicos')||'[]');}catch(e){servicos=[];}
-  try{pagamentos=JSON.parse(localStorage.getItem('clarus_pagamentos')||'[]');}catch(e){pagamentos=[];}
+async function load(){
+  try {
+    const { data: clientesData, error: clientesError } = await supabaseClient
+      .from('Clientes')
+      .select('*');
+
+    if (clientesError) throw clientesError;
+
+    clientes = clientesData.map(c => ({
+      id: c.id,
+      nome: c.nome,
+      wp: c.telefone,
+      doc: c.empresa,
+      email: c.email,
+      seg: c.segmento,
+      status: c.status,
+      obs: c.observacoes,
+      svcIds: c.servicos ? c.servicos.split(', ') : []
+    }));
+
+  } catch(e) {
+    console.error('Erro ao carregar clientes:', e);
+    clientes = [];
+  }
+
+  try {
+    const { data: servicosData, error: servicosError } = await supabaseClient
+      .from('Servicos')
+      .select('*');
+
+    if (servicosError) throw servicosError;
+
+    servicos = servicosData || [];
+
+  } catch(e) {
+    console.error('Erro ao carregar serviços:', e);
+    servicos = [];
+  }
+
+  try {
+    const { data: pagamentosData, error: pagamentosError } = await supabaseClient
+      .from('Pagamentos')
+      .select('*');
+
+    if (pagamentosError) throw pagamentosError;
+
+    pagamentos = pagamentosData || [];
+
+  } catch(e) {
+    console.error('Erro ao carregar pagamentos:', e);
+    pagamentos = [];
+  }
+
+  renderCli();
+  renderSvc();
+  renderPay();
+  renderDash();
+}
 }
 function save(){
   localStorage.setItem('clarus_clientes',JSON.stringify(clientes));
