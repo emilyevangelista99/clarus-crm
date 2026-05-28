@@ -647,16 +647,32 @@ function editCli2(id){
   openMdl('mdl-cli');
 }
 async function delCli(id){
+  console.log('ID recebido para excluir:', id);
+
+  if(!id){
+    alert('ID do cliente não encontrado.');
+    return;
+  }
+
   if(!confirm('Excluir este cliente?'))return;
+
   try{
     const { error } = await supabaseClient
       .from('Clientes')
       .delete()
       .eq('id', id);
-    if(error){alert('Erro ao excluir cliente');console.error(error);return;}
-    clientes=clientes.filter(function(c){return c.id!==id;});
+
+    if(error){
+      alert('Erro ao excluir cliente');
+      console.error(error);
+      return;
+    }
+
+    clientes = clientes.filter(function(c){return String(c.id) !== String(id);});
+
     renderCli();
     renderDash();
+
   }catch(e){
     console.error('ERRO AO EXCLUIR CLIENTE:', e);
     alert('Erro geral ao excluir cliente. Veja o console.');
