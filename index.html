@@ -192,7 +192,22 @@ svg.ico-lg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7
 
 </div>
 </div>
+<!-- NOVA SENHA CLARUS -->
+<div id="reset-screen" class="login-screen" style="display:none;">
+  <div class="login-card">
+    <div class="login-title">Nova senha</div>
+    <div class="login-subtitle">Crie uma nova senha de acesso</div>
 
+    <input type="password" id="nova-senha" placeholder="Nova senha">
+    <input type="password" id="confirma-nova-senha" placeholder="Confirmar nova senha">
+
+    <div id="reset-error" class="login-error"></div>
+
+    <button class="btn-p" style="width:100%;justify-content:center;" onclick="salvarNovaSenhaClarus()">
+      Salvar nova senha
+    </button>
+  </div>
+</div>
 <div class="topbar">
   <div id="reset-screen" class="login-screen" style="display:none;">
   <div class="login-card">
