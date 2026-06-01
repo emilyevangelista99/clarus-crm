@@ -458,7 +458,14 @@ async function load(){
 
   // SERVIÇOS: mantém a lógica original em localStorage para não quebrar o sistema
   try {
-    servicos = JSON.parse(localStorage.getItem('clarus_servicos') || '[]');
+   const { data: servicosData, error: servicosError } =
+  await supabaseClient
+    .from('Servicos')
+    .select('*');
+
+if(servicosError) throw servicosError;
+
+servicos = servicosData || [];
   } catch(e) {
     console.error('Erro ao carregar serviços:', e);
     servicos = [];
