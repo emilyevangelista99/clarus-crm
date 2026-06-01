@@ -711,9 +711,28 @@ function renderSvc(){
     : '<tr><td colspan="5"><div class="emp">Nenhum serviço cadastrado.</div></td></tr>';
 }
 function editSvc2(id){
-  var s=servicos.find(function(x){return x.id===id;});if(!s)return;
-  editSvc=id;document.getElementById('svc-nome').value=s.nome;document.getElementById('svc-desc').value=s.desc||'';document.getElementById('svc-rec').value=s.rec;document.getElementById('svc-val').value=s.val||'';
-  document.getElementById('mdl-svc-t').textContent='Editar serviço';openMdl('mdl-svc');
+  console.log('Editar serviço ID:', id);
+
+  var s = servicos.find(function(x){
+    return String(x.id) === String(id);
+  });
+
+  if(!s){
+    alert('Serviço não encontrado para editar.');
+    console.log('Lista de serviços:', servicos);
+    return;
+  }
+
+  editSvc = id;
+
+  document.getElementById('svc-nome').value = s.nome || '';
+  document.getElementById('svc-desc').value = s.desc || '';
+  document.getElementById('svc-rec').value = s.rec || '';
+  document.getElementById('svc-val').value = s.val || '';
+
+  document.getElementById('mdl-svc-t').textContent = 'Editar serviço';
+
+  openMdl('mdl-svc');
 }
 async function delSvc(id){
   if(!confirm('Excluir este serviço?')) return;
