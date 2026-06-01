@@ -1250,16 +1250,31 @@ function calcDesconto() {
 
   await load();
 }
-function salvarEditPag() {
+async function salvarEditPag() {
   var novoVal = parseFloat(document.getElementById('ep-valor').value);
   var novaObs = document.getElementById('ep-obs').value.trim();
-  if (isNaN(novoVal) || novoVal < 0) { alert('Valor inválido.'); return; }
-  var i = pagamentos.findIndex(function(x){ return x.id===editPagId; });
-  if (i > -1) {
-    pagamentos[i].valor = novoVal.toFixed(2);
-    if (novaObs) pagamentos[i].desc = novaObs;
+
+  if (isNaN(novoVal) || novoVal < 0) {
+    alert('Valor inválido.');
+    return;
   }
-  save(); closeMdl('mdl-editpag'); renderPag(); renderDash();
+
+  const { error } = await supabaseClient
+    .from('pagamentos')
+    .update({
+      valor: novoVal.toFixed(2),
+      descricao: novaObs
+    })
+    .eq('id', editPagId);
+
+  if(error){
+    console.error('Erro ao editar pagamento:', error);
+    alert('Erro ao editar pagamento. Veja o console.');
+    return;
+  }
+
+  closeMdl('mdl-editpag');
+  await load();
 }
 
 
