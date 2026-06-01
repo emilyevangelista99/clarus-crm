@@ -1206,17 +1206,24 @@ else if (action === 'delPag') delPag(id);
 // =========================================================
 delPag
 function abrirEditPag(id) {
-  var p = pagamentos.find(function(x){ return x.id===id; });
+  var p = pagamentos.find(function(x){
+    return String(x.id) === String(id);
+  });
+
   if (!p) return;
+
   editPagId = id;
+
   document.getElementById('ep-venc').textContent = fmtD(p.vencimento);
-  document.getElementById('ep-svc').textContent = getSN(p.svcId);
-  document.getElementById('ep-cli').textContent = getCN(p.clienteId);
+  document.getElementById('ep-svc').textContent = getSN(p.servico_id);
+  document.getElementById('ep-cli').textContent = getCN(p.cliente_id);
   document.getElementById('ep-valor-orig').textContent = fmtM(p.valor);
   document.getElementById('ep-valor').value = p.valor;
   document.getElementById('ep-desc').value = '';
-  document.getElementById('ep-obs').value = p.desc || '';
+  document.getElementById('ep-obs').value = p.descricao || '';
+
   calcDesconto();
+
   openMdl('mdl-editpag');
 }
 function calcDesconto() {
