@@ -460,7 +460,7 @@ async function load(){
   try {
    const { data: servicosData, error: servicosError } =
   await supabaseClient
-    .from('Servicos')
+   .from('servicos')
     .select('*');
 
 if(servicosError) throw servicosError;
@@ -714,7 +714,7 @@ async function saveSvc(){
   try {
     if(editSvc){
       const { data, error } = await supabaseClient
-        .from('Servicos')
+        .from('servicos')
         .update(d)
         .eq('id', editSvc)
         .select()
@@ -727,7 +727,7 @@ async function saveSvc(){
 
     } else {
       const { data, error } = await supabaseClient
-        .from('Servicos')
+        .from('servicos')
         .insert([d])
         .select()
         .single();
