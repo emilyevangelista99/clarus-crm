@@ -553,27 +553,53 @@ function closeMdl(id){
 function renderDash(){
   var now=new Date();
   document.getElementById('dash-date').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   var ativos=clientes.filter(function(c){return c.status==='ativo';}).length;
   var pend=pagamentos.filter(function(p){return p.status==='pendente';});
   var late=pagamentos.filter(function(p){return isLate(p.vencimento,p.status);});
   var mes=thisMonth();
-var recMes=pagamentos.filter(function(p){return p.status==='pago'&&(p.data_pag||'').slice(0,7)===mes;}).reduce(function(s,p){return s+parseFloat(p.valor||0);},0);
+
+  var recMes=pagamentos
+    .filter(function(p){return p.status==='pago'&&(p.data_pag||'').slice(0,7)===mes;})
+    .reduce(function(s,p){return s+parseFloat(p.valor||0);},0);
+
   document.getElementById('dash-stats').innerHTML=
-    '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Clientes ativos</div><div class="sv pu">'+ativos+'</div></div>'+
-    '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pendentes</div><div class="sv am">'+pend.length+'</div></div>'+
-    '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Em atraso</div><div class="sv re">'+late.length+'</div></div>'+
-    '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Receita do m&ecirc;s</div><div class="sv sa">'+fmtM(recMes)+'</div></div>';
-function mkTr(p,cor){
-  return '<tr><td style="font-size:13px;">'+esc(getCN(p.cliente_id))+'</td><td style="font-size:12px;color:var(--text2);">'+esc(getSN(p.servico_id))+'</td><td style="font-size:13px;'+cor+'">'+fmtD(p.vencimento)+'</td><td style="font-weight:500;">'+fmtM(p.valor)+'</td></tr>';
-}
+    '<div class="sc"><div class="sl">Clientes ativos</div><div class="sv pu">'+ativos+'</div></div>'+
+    '<div class="sc"><div class="sl">Pendentes</div><div class="sv am">'+pend.length+'</div></div>'+
+    '<div class="sc"><div class="sl">Em atraso</div><div class="sv re">'+late.length+'</div></div>'+
+    '<div class="sc"><div class="sl">Receita do m&ecirc;s</div><div class="sv sa">'+fmtM(recMes)+'</div></div>';
 
-var thead='<thead><tr><th>Cliente</th><th>Servi&ccedil;o</th><th>Vencimento</th><th>Valor</th></tr></thead>';
-  var pr=pend.sort(function(a,b){return a.vencimento>b.vencimento?1:-1;}).slice(0,6).map(function(p){return mkTr(p,'');}).join('');
-  document.getElementById('dash-pend').innerHTML=pend.length?'<table class="tbl">'+thead+'<tbody>'+pr+'</tbody></table>':'<div class="emp"><svg class="ico-lg" style="color:var(--cs);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Nenhum pendente</div>';
-  var lr=late.sort(function(a,b){return a.vencimento>b.vencimento?1:-1;}).slice(0,6).map(function(p){return mkTr(p,'color:#A32D2D;font-weight:600;');}).join('');
-  document.getElementById('dash-late').innerHTML=late.length?'<table class="tbl">'+thead+'<tbody>'+lr+'</tbody></table>':'<div class="emp"><svg class="ico-lg" style="color:var(--cs);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Tudo em dia</div>';
-}
+  function mkTr(p,cor){
+    return '<tr>'+
+      '<td style="font-size:13px;">'+esc(getCN(p.cliente_id))+'</td>'+
+      '<td style="font-size:12px;color:var(--text2);">'+esc(getSN(p.servico_id))+'</td>'+
+      '<td style="font-size:13px;'+cor+'">'+fmtD(p.vencimento)+'</td>'+
+      '<td style="font-weight:500;">'+fmtM(p.valor)+'</td>'+
+    '</tr>';
+  }
 
+  var thead='<thead><tr><th>Cliente</th><th>Servi&ccedil;o</th><th>Vencimento</th><th>Valor</th></tr></thead>';
+
+  var pr=pend
+    .sort(function(a,b){return a.vencimento>b.vencimento?1:-1;})
+    .slice(0,6)
+    .map(function(p){return mkTr(p,'');})
+    .join('');
+
+  document.getElementById('dash-pend').innerHTML=pend.length
+    ? '<table class="tbl">'+thead+'<tbody>'+pr+'</tbody></table>'
+    : '<div class="emp">Nenhum pendente</div>';
+
+  var lr=late
+    .sort(function(a,b){return a.vencimento>b.vencimento?1:-1;})
+    .slice(0,6)
+    .map(function(p){return mkTr(p,'color:#A32D2D;font-weight:600;');})
+    .join('');
+
+  document.getElementById('dash-late').innerHTML=late.length
+    ? '<table class="tbl">'+thead+'<tbody>'+lr+'</tbody></table>'
+    : '<div class="emp">Tudo em dia</div>';
+  
 // =========================================================
 // CLIENTES
 // =========================================================
