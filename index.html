@@ -1670,7 +1670,18 @@ window.saveSvc = async function saveSvc(){
     alert('Erro ao salvar serviço. Veja o console.');
   }
 };
-  
+  window.verificarSessaoClarus = async function(){
+
+  const { data:{ session } } =
+    await supabaseClient.auth.getSession();
+
+  if(session){
+    mostrarCRM();
+    await load();
+  }else{
+    esconderCRM();
+  }
+};
 document.addEventListener('DOMContentLoaded', function(){
   verificarSessaoClarus();
 });
