@@ -1086,7 +1086,9 @@ async function confirmarPag(){
   },100);
 }
 function showRec(id){
-  var p=pagamentos.find(function(x){return String(x.id)===String(id);});
+var p=pagamentos.find(function(x){
+  return String(x.id)===String(id) || String(x.servico_id)===String(id);
+});
   if(!p)return;
 
   var c=clientes.find(function(x){return String(x.id)===String(p.cliente_id);});
