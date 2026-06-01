@@ -1216,7 +1216,60 @@ function abrirBackupModal() {
     total + ' cobran\u00e7a' + (total!==1?'s':'');
   openMdl('mdl-backup');
 }
+window.saveSvc = async function saveSvc(){
+  var nome = document.getElementById('svc-nome').value.trim();
 
+  if(!nome){
+    alert('Informe o nome do serviço.');
+    return;
+  }
+
+  var d = {
+    nome: nome,
+    desc: document.getElementById('svc-desc').value.trim(),
+    rec: document.getElementById('svc-rec').value,
+    val: document.getElementById('svc-val').value
+  };
+
+  try {
+    if(editSvc){
+      const { data, error } = await supabaseClient
+        .from('servicos')
+        .update(d)
+        .eq('id', editSvc)
+        .select()
+        .single();
+
+      if(error) throw error;
+
+      var i = servicos.findIndex(function(s){
+        return String(s.id) === String(editSvc);
+      });
+
+      if(i > -1) servicos[i] = data;
+
+    } else {
+      const { data, error } = await supabaseClient
+        .from('servicos')
+        .insert([d])
+        .select()
+        .single();
+
+      if(error) throw error;
+
+      servicos.push(data);
+    }
+
+    closeMdl('mdl-svc');
+    renderSvc();
+    renderDash();
+
+  } catch(e) {
+    console.error('Erro ao salvar serviço:', e);
+    alert('Erro ao salvar serviço. Veja o console.');
+  }
+};
+  
 document.addEventListener('DOMContentLoaded', function(){
   load();
   seed();
