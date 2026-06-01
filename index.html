@@ -949,26 +949,84 @@ function updPrev(){
   var resto=qtd>4?' ... até '+qtd+'ª parcela':'';
   prev.innerHTML='<strong>'+qtd+' cobrança'+(qtd>1?'s':'')+':</strong> '+dts.join(' · ')+resto;
 }
-function savePag(){
+async function savePag(){
   var cid=document.getElementById('pag-cli').value;
   var sid=document.getElementById('pag-svc').value;
   var val=document.getElementById('pag-val').value;
-  if(!cid||!sid||!val){alert('Preencha cliente, serviço e valor.');return;}
+
+  if(!cid||!sid||!val){
+    alert('Preencha cliente, serviço e valor.');
+    return;
+  }
+
+  var novosPagamentos = [];
+
   if(recType==='mensal'){
     var dia=document.getElementById('pag-dia').value;
     var mi=document.getElementById('pag-mesi').value;
     var qtd=parseInt(document.getElementById('pag-mqtd').value)||12;
-    if(!dia||!mi){alert('Informe o dia e o mês inicial.');return;}
-    var pts=mi.split('-').map(Number);var ano=pts[0];var mes=pts[1];
+
+    if(!dia||!mi){
+      alert('Informe o dia e o mês inicial.');
+      return;
+    }
+
+    var pts=mi.split('-').map(Number);
+    var ano=pts[0];
+    var mes=pts[1];
     var sn=getSN(sid);
-    for(var i=0;i<qtd;i++){var m=mes+i,y=ano+Math.floor((m-1)/12);m=((m-1)%12)+1;var dd=String(dia).padStart(2,'0'),mm=String(m).padStart(2,'0');pagamentos.push({id:uid(),clienteId:cid,svcId:sid,vencimento:y+'-'+mm+'-'+dd,valor:val,tipo:'mensal',desc:sn+' '+mm+'/'+y,status:'pendente',criado:today()});}
+
+    for(var i=0;i<qtd;i++){
+      var m=mes+i;
+      var y=ano+Math.floor((m-1)/12);
+      m=((m-1)%12)+1;
+
+      var dd=String(dia).padStart(2,'0');
+      var mm=String(m).padStart(2,'0');
+
+      novosPagamentos.push({
+        cliente_id: cid,
+        servico_id: sid,
+        vencimento: y+'-'+mm+'-'+dd,
+        valor: val,
+        tipo: 'mensal',
+        descricao: sn+' '+mm+'/'+y,
+        status: 'pendente'
+      });
+    }
+
   } else {
     var vav=document.getElementById('pag-vav').value;
     var dav=document.getElementById('pag-dav').value.trim();
-    if(!vav){alert('Informe a data de vencimento.');return;}
-    pagamentos.push({id:uid(),clienteId:cid,svcId:sid,vencimento:vav,valor:val,tipo:'avulso',desc:dav,status:'pendente',criado:today()});
+
+    if(!vav){
+      alert('Informe a data de vencimento.');
+      return;
+    }
+
+    novosPagamentos.push({
+      cliente_id: cid,
+      servico_id: sid,
+      vencimento: vav,
+      valor: val,
+      tipo: 'avulso',
+      descricao: dav,
+      status: 'pendente'
+    });
   }
-  save();closeMdl('mdl-pag');renderPag();renderDash();
+
+  const { error } = await supabaseClient
+    .from('pagamentos')
+    .insert(novosPagamentos);
+
+  if(error){
+    console.error('Erro ao salvar pagamento:', error);
+    alert('Erro ao salvar pagamento. Veja o console.');
+    return;
+  }
+
+  closeMdl('mdl-pag');
+  await load();
 }
 
 // =========================================================
