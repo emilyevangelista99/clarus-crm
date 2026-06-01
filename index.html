@@ -1230,6 +1230,28 @@ function calcDesconto() {
   document.getElementById('ep-valor').value = novo.toFixed(2);
   document.getElementById('ep-valor-final').textContent = fmtM(novo);
 }
+  async function delPag(id) {
+  var p = pagamentos.find(function(x){ return String(x.id)===String(id); });
+  if (!p) return;
+
+  var cli = getCN(p.cliente_id);
+  var svc = getSN(p.servico_id);
+
+  if (!confirm('Excluir cobrança de ' + fmtD(p.vencimento) + ' - ' + svc + ' (' + cli + ')? Somente este mês será excluído.')) return;
+
+  const { error } = await supabaseClient
+    .from('pagamentos')
+    .delete()
+    .eq('id', id);
+
+  if(error){
+    console.error('Erro ao excluir pagamento:', error);
+    alert('Erro ao excluir pagamento. Veja o console.');
+    return;
+  }
+
+  await load();
+}
 function salvarEditPag() {
   var novoVal = parseFloat(document.getElementById('ep-valor').value);
   var novaObs = document.getElementById('ep-obs').value.trim();
