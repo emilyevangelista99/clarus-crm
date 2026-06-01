@@ -735,10 +735,16 @@ function editSvc2(id){
   openMdl('mdl-svc');
 }
 async function delSvc(id){
+  console.log('Excluir serviço ID:', id);
+
+  if(!id){
+    alert('ID do serviço não encontrado.');
+    return;
+  }
+
   if(!confirm('Excluir este serviço?')) return;
 
   try {
-
     const { error } = await supabaseClient
       .from('servicos')
       .delete()
