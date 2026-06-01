@@ -493,7 +493,9 @@ try {
   renderDash();
 }
 function save(){
-  console.warn('save() antigo chamado, mas os dados agora são salvos no Supabase.');
+  localStorage.setItem('clarus_clientes',JSON.stringify(clientes));
+  localStorage.setItem('clarus_servicos',JSON.stringify(servicos));
+  localStorage.setItem('clarus_pagamentos',JSON.stringify(pagamentos));
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function today(){return new Date().toISOString().slice(0,10);}
