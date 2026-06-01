@@ -1206,18 +1206,7 @@ document.addEventListener('click', function(e) {
 // =========================================================
 // EDITAR / EXCLUIR COBRANÇA INDIVIDUAL
 // =========================================================
-function delPag(id) {
-  var p = pagamentos.find(function(x){ return x.id===id; });
-  if (!p) return;
-  var cli = getCN(p.clienteId);
-  var svc = getSN(p.svcId);
-  if (!confirm('Excluir cobrança de ' + fmtD(p.vencimento) + ' - ' + svc + ' (' + cli + ')? Somente este mês será excluído.')) return;
-  pagamentos = pagamentos.filter(function(x){ return x.id !== id; });
-  save(); renderPag(); renderDash();
-}
-
-var editPagId = null;
-var lastReciboId = null;
+delPag
 function abrirEditPag(id) {
   var p = pagamentos.find(function(x){ return x.id===id; });
   if (!p) return;
