@@ -502,7 +502,70 @@ const supabaseClient = window.supabase.createClient(
 
 console.log('Supabase conectado!')
 </script>
+<script>
+// =========================================================
+// AUTENTICAÇÃO — LOGIN CLARUS
+// =========================================================
 
+async function loginClarus(){
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+  var erro = document.getElementById('login-error');
+
+  erro.textContent = '';
+
+  if(!email || !password){
+    erro.textContent = 'Informe e-mail e senha.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if(error){
+    erro.textContent = 'E-mail ou senha inválidos.';
+    console.error('Erro no login:', error);
+    return;
+  }
+
+  mostrarCRM();
+  await load();
+}
+
+async function logoutClarus(){
+  await supabaseClient.auth.signOut();
+  esconderCRM();
+}
+
+function esconderCRM(){
+  document.getElementById('login-screen').style.display = 'flex';
+
+  document.querySelectorAll('.topbar, .page').forEach(function(el){
+    el.classList.add('app-hidden');
+  });
+}
+
+function mostrarCRM(){
+  document.getElementById('login-screen').style.display = 'none';
+
+  document.querySelectorAll('.topbar, .page').forEach(function(el){
+    el.classList.remove('app-hidden');
+  });
+}
+
+async function verificarSessaoClarus(){
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+
+  if(session){
+    mostrarCRM();
+    await load();
+  }else{
+    esconderCRM();
+  }
+}
+</script>
 <script>
 // =========================================================
 // DADOS
