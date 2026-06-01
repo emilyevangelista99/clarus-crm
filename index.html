@@ -690,29 +690,91 @@ async function delCli(id){
 // SERVIÇOS
 // =========================================================
 var recMap={mensal:'Mensal',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual',avulso:'Avulso'};
-function clrSvc(){['svc-nome','svc-desc','svc-val'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});document.getElementById('svc-rec').value='mensal';document.getElementById('mdl-svc-t').textContent='Novo serviço';}
+
+function clrSvc(){
+  ['svc-nome','svc-desc','svc-val'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e)e.value='';
+  });
+  document.getElementById('svc-rec').value='mensal';
+  document.getElementById('mdl-svc-t').textContent='Novo serviço';
+}
+
 function renderSvc(){
   var icoEd='<svg class="ico" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
   var icoTr='<svg class="ico" style="width:14px;height:14px;" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
 
   document.getElementById('tb-svc').innerHTML = servicos.length
     ? servicos.map(function(s){
-        return '<tr>' +
-          '<td style="font-weight:500;">'+esc(s.nome)+'</td>' +
-          '<td style="font-size:12px;color:var(--text2);">'+esc(s.desc||'-')+'</td>' +
-          '<td><span class="bdg bp">'+(recMap[s.rec]||s.rec||'-')+'</span></td>' +
-          '<td style="font-weight:500;">'+fmtM(s.val)+'</td>' +
-          '<td><div style="display:flex;gap:4px;">' +
-            '<button class="ib" title="Editar" onclick="editSvc2(\''+s.id+'\')">'+icoEd+'</button>' +
-            '<button class="ib" title="Excluir" onclick="delSvc(\''+s.id+'\')">'+icoTr+'</button>' +
-          '</div></td>' +
-        '</tr>';
-      }).join('')
+      return '<tr>' +
+        '<td style="font-weight:500;">'+esc(s.nome)+'</td>' +
+        '<td style="font-size:12px;color:var(--text2);">'+esc(s.desc||'-')+'</td>' +
+        '<td><span class="bdg bp">'+(recMap[s.rec]||s.rec||'-')+'</span></td>' +
+        '<td style="font-weight:500;">'+fmtM(s.val)+'</td>' +
+        '<td><div style="display:flex;gap:4px;">' +
+          '<button class="ib" data-action="editSvc" data-id="'+s.id+'">'+icoEd+'</button>' +
+          '<button class="ib" data-action="delSvc" data-id="'+s.id+'">'+icoTr+'</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('')
     : '<tr><td colspan="5"><div class="emp">Nenhum serviço cadastrado.</div></td></tr>';
 }
-function editSvc2(id){
-  console.log('Editar serviço ID:', id);
 
+async function saveSvc(){
+  var nome = document.getElementById('svc-nome').value.trim();
+
+  if(!nome){
+    alert('Informe o nome do serviço.');
+    return;
+  }
+
+  var d = {
+    nome: nome,
+    desc: document.getElementById('svc-desc').value.trim(),
+    rec: document.getElementById('svc-rec').value,
+    val: document.getElementById('svc-val').value
+  };
+
+  try {
+    if(editSvc){
+      const { data, error } = await supabaseClient
+        .from('servicos')
+        .update(d)
+        .eq('id', editSvc)
+        .select()
+        .single();
+
+      if(error) throw error;
+
+      var i = servicos.findIndex(function(s){
+        return String(s.id) === String(editSvc);
+      });
+
+      if(i > -1) servicos[i] = data;
+
+    } else {
+      const { data, error } = await supabaseClient
+        .from('servicos')
+        .insert([d])
+        .select()
+        .single();
+
+      if(error) throw error;
+
+      servicos.push(data);
+    }
+
+    closeMdl('mdl-svc');
+    renderSvc();
+    renderDash();
+
+  } catch(e) {
+    console.error('Erro ao salvar serviço:', e);
+    alert('Erro ao salvar serviço. Veja o console.');
+  }
+}
+
+function editSvc2(id){
   var s = servicos.find(function(x){
     return String(x.id) === String(id);
   });
@@ -727,21 +789,14 @@ function editSvc2(id){
 
   document.getElementById('svc-nome').value = s.nome || '';
   document.getElementById('svc-desc').value = s.desc || '';
-  document.getElementById('svc-rec').value = s.rec || '';
+  document.getElementById('svc-rec').value = s.rec || 'mensal';
   document.getElementById('svc-val').value = s.val || '';
 
   document.getElementById('mdl-svc-t').textContent = 'Editar serviço';
-
   openMdl('mdl-svc');
 }
+
 async function delSvc(id){
-  console.log('Excluir serviço ID:', id);
-
-  if(!id){
-    alert('ID do serviço não encontrado.');
-    return;
-  }
-
   if(!confirm('Excluir este serviço?')) return;
 
   try {
