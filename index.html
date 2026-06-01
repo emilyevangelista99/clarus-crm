@@ -902,7 +902,7 @@ function renderPag(){
         '<button class="btn-s" style="font-size:12px;padding:5px 9px;color:#A32D2D;border-color:rgba(163,45,45,0.3);" data-action="delPag" data-id="'+p.id+'" title="Excluir este mês">'+icoDel+'</button>'+
         '</div>'
       :'<button class="btn-s" style="font-size:12px;padding:5px 10px;" data-action="recibo" data-id="'+p.id+'">'+icoFi+' Recibo</button>';
-    return'<tr><td style="font-weight:500;">'+esc(getCN(p.clienteId))+'</td><td>'+esc(getSN(p.svcId))+'<div style="font-size:11px;color:var(--text2);">'+esc(p.descricao||'')+'</div></td><td style="'+(late?'color:#A32D2D;font-weight:600;':'')+'">'+fmtD(p.vencimento)+'</td><td style="font-weight:500;">'+fmtM(p.valor)+'</td><td>'+tpB+'</td><td>'+stB+'</td><td>'+acts+'</td></tr>';
+    return'<tr><td style="font-weight:500;">'+esc(getCN(p.cliente_id))+'</td><td>'+esc(getSN(p.servico_id))+'<div style="font-size:11px;color:var(--text2);">'+esc(p.descricao||'')+'</div></td><td style="'+(late?'color:#A32D2D;font-weight:600;':'')+'">'+fmtD(p.vencimento)+'</td><td style="font-weight:500;">'+fmtM(p.valor)+'</td><td>'+tpB+'</td><td>'+stB+'</td><td>'+acts+'</td></tr>';
   }).join(''):'<tr><td colspan="7"><div class="emp">Nenhuma cobrança encontrada.</div></td></tr>';
 }
 function abrirNovaCob(){selRT('mensal');document.getElementById('mdl-pag-t').textContent='Nova cobrança';openMdl('mdl-pag');}
