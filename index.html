@@ -1206,9 +1206,14 @@ else if (action === 'delPag') delPag(id);
 // =========================================================
 delPag
 function abrirEditPag(id) {
+  console.log('ABRINDO EDITAR ID:', id);
+  console.log('LISTA PAGAMENTOS:', pagamentos);
+
   var p = pagamentos.find(function(x){
     return String(x.id) === String(id);
   });
+
+  console.log('PAGAMENTO ENCONTRADO:', p);
 
   if (!p) return;
 
