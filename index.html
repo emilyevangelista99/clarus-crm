@@ -885,7 +885,7 @@ function renderPag(){
   if(sel){var cur=sel.value;sel.innerHTML='<option value="">Todos os clientes</option>'+clientes.map(function(c){return'<option value="'+c.id+'"'+(cur===c.id?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('');sel.value=cur;}
   var list=pagamentos.filter(function(p){
     var st=isLate(p.vencimento,p.status)?'atrasado':p.status;
-    return(!sf||(sf==='atrasado'?st==='atrasado':p.status===sf))&&(!cf||p.clienteId===cf)&&(!tf||p.tipo===tf)&&(!mf||p.vencimento.slice(0,7)===mf);
+    return(!sf||(sf==='atrasado'?st==='atrasado':p.status===sf))&&(!cf||p.cliente_id===cf)&&(!tf||p.tipo===tf)&&(!mf||p.vencimento.slice(0,7)===mf);
   }).sort(function(a,b){return a.vencimento>b.vencimento?1:-1;});
   var icoFi='<svg class="ico" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>';
   var icoOk='<svg class="ico" style="width:14px;height:14px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
