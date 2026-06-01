@@ -1058,6 +1058,7 @@ async function confirmarPag(){
   }
 
   var pid=confPagId;
+  console.log('CONFIRMANDO PAGAMENTO ID:', pid);
   var numRec='REC-'+Date.now().toString().slice(-6);
 
   const { error } = await supabaseClient
