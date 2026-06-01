@@ -1046,16 +1046,42 @@ async function savePag(){
 // CONFIRMAR + RECIBO
 // =========================================================
 function abrirConf(id){confPagId=id;document.getElementById('conf-data').value=today();document.getElementById('conf-obs').value='';openMdl('mdl-conf');}
-function confirmarPag(){
+async function confirmarPag(){
   var data=document.getElementById('conf-data').value;
   var forma=document.getElementById('conf-forma').value;
   var obs=document.getElementById('conf-obs').value;
-  if(!data){alert('Informe a data do pagamento.');return;}
-  var i=pagamentos.findIndex(function(p){return p.id===confPagId;});
-  if(i>-1){pagamentos[i].status='pago';pagamentos[i].dataPag=data;pagamentos[i].forma=forma;pagamentos[i].obsPag=obs;pagamentos[i].numRec='REC-'+Date.now().toString().slice(-6);}
-  save();
-  var pid=confPagId;closeMdl('mdl-conf');renderPag();renderDash();
-  setTimeout(function(){showRec(pid);},100);
+
+  if(!data){
+    alert('Informe a data do pagamento.');
+    return;
+  }
+
+  var pid=confPagId;
+  var numRec='REC-'+Date.now().toString().slice(-6);
+
+  const { error } = await supabaseClient
+    .from('pagamentos')
+    .update({
+      status: 'pago',
+      data_pag: data,
+      forma: forma,
+      obs_pag: obs,
+      num_rec: numRec
+    })
+    .eq('id', pid);
+
+  if(error){
+    console.error('Erro ao confirmar pagamento:', error);
+    alert('Erro ao confirmar pagamento. Veja o console.');
+    return;
+  }
+
+  closeMdl('mdl-conf');
+  await load();
+
+  setTimeout(function(){
+    showRec(pid);
+  },100);
 }
 function showRec(id){
   var p=pagamentos.find(function(x){return x.id===id;});if(!p)return;
