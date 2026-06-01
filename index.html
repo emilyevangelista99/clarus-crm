@@ -471,13 +471,21 @@ servicos = servicosData || [];
     servicos = [];
   }
 
-  // PAGAMENTOS: mantém a lógica original em localStorage para não quebrar o sistema
-  try {
-    pagamentos = JSON.parse(localStorage.getItem('clarus_pagamentos') || '[]');
-  } catch(e) {
-    console.error('Erro ao carregar pagamentos:', e);
-    pagamentos = [];
-  }
+// PAGAMENTOS
+try {
+  const { data: pagamentosData, error: pagamentosError } =
+    await supabaseClient
+      .from('pagamentos')
+      .select('*');
+
+  if (pagamentosError) throw pagamentosError;
+
+  pagamentos = pagamentosData || [];
+
+} catch(e) {
+  console.error('Erro ao carregar pagamentos:', e);
+  pagamentos = [];
+}
 
   renderCli();
   renderSvc();
