@@ -1086,21 +1086,31 @@ async function confirmarPag(){
   },100);
 }
 function showRec(id){
-  var p=pagamentos.find(function(x){return x.id===id;});if(!p)return;
-  var c=clientes.find(function(x){return x.id===p.clienteId;});
-  var s=servicos.find(function(x){return x.id===p.svcId;});
+  var p=pagamentos.find(function(x){return String(x.id)===String(id);});
+  if(!p)return;
+
+  var c=clientes.find(function(x){return String(x.id)===String(p.cliente_id);});
+  var s=servicos.find(function(x){return String(x.id)===String(p.servico_id);});
+
   var logoSrc=document.getElementById('topbar-logo').src;
   var rows='';
-  rows+='<div class="rrow"><span class="rl">Nº Recibo</span><span class="rv">'+esc(p.numRec||'-')+'</span></div>';
+
+  rows+='<div class="rrow"><span class="rl">Nº Recibo</span><span class="rv">'+esc(p.num_rec||'-')+'</span></div>';
   rows+='<div class="rrow"><span class="rl">Cliente</span><span class="rv">'+esc(c?c.nome:'-')+'</span></div>';
+
   if(c&&c.doc)rows+='<div class="rrow"><span class="rl">CNPJ/CPF</span><span class="rv">'+esc(c.doc)+'</span></div>';
+
   rows+='<div class="rrow"><span class="rl">Serviço</span><span class="rv">'+esc(s?s.nome:'-')+'</span></div>';
-  if(p.desc)rows+='<div class="rrow"><span class="rl">Referência</span><span class="rv">'+esc(p.desc)+'</span></div>';
+
+  if(p.descricao)rows+='<div class="rrow"><span class="rl">Referência</span><span class="rv">'+esc(p.descricao)+'</span></div>';
+
   rows+='<div class="rrow"><span class="rl">Tipo</span><span class="rv">'+(p.tipo==='mensal'?'Mensalidade recorrente':'Avulso / Pontual')+'</span></div>';
   rows+='<div class="rrow"><span class="rl">Vencimento</span><span class="rv">'+fmtD(p.vencimento)+'</span></div>';
-  rows+='<div class="rrow"><span class="rl">Data de pagamento</span><span class="rv">'+fmtD(p.dataPag)+'</span></div>';
+  rows+='<div class="rrow"><span class="rl">Data de pagamento</span><span class="rv">'+fmtD(p.data_pag)+'</span></div>';
   rows+='<div class="rrow"><span class="rl">Forma de pagamento</span><span class="rv">'+esc(p.forma||'-')+'</span></div>';
-  if(p.obsPag)rows+='<div class="rrow"><span class="rl">Observação</span><span class="rv">'+esc(p.obsPag)+'</span></div>';
+
+  if(p.obs_pag)rows+='<div class="rrow"><span class="rl">Observação</span><span class="rv">'+esc(p.obs_pag)+'</span></div>';
+
   document.getElementById('recibo-body').innerHTML=
     '<div class="rwrap" id="rec-print">'+
     '<div class="rhdr"><img class="rliimg" src="'+logoSrc+'" alt="CLARUS"></div>'+
@@ -1109,6 +1119,7 @@ function showRec(id){
     '<div class="rtot"><span>Valor recebido</span><span>'+fmtM(p.valor)+'</span></div>'+
     '<div class="rftr">Emitido em '+fmtD(today())+' por <strong>CLARUS Assessoria Empresarial</strong><br><span style="font-size:10px;">www.clarusassessoria.com.br &middot; Documento sem valor fiscal</span></div>'+
     '</div>';
+
   lastReciboId = id;
   openMdl('mdl-recibo');
 }
