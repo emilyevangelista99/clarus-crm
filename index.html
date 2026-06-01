@@ -503,8 +503,21 @@ function thisMonth(){return today().slice(0,7);}
 function fmtM(v){return 'R$ '+parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtD(d){if(!d)return '-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 function ini(n){return n.trim().split(/\s+/).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');}
-function getCN(id){var c=clientes.find(function(x){return x.id===id;});return c?c.nome:'-';}
-function getSN(id){var s=servicos.find(function(x){return x.id===id;});return s?s.nome:'-';}
+function getCN(id){
+  id = String(id || '').trim();
+  var c = clientes.find(function(x){
+    return String(x.id || '').trim() === id;
+  });
+  return c ? c.nome : '-';
+}
+
+function getSN(id){
+  id = String(id || '').trim();
+  var s = servicos.find(function(x){
+    return String(x.id || '').trim() === id;
+  });
+  return s ? s.nome : '-';
+}
 function isLate(v,s){return s==='pendente'&&v<today();}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
