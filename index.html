@@ -999,8 +999,12 @@ function seed(){
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('[data-action]');
   if (!btn) return;
+
   var action = btn.getAttribute('data-action');
-  var id = (btn.getAttribute('data-id')||'').replace(/^'+|'+$/g,'');
+  var id = btn.getAttribute('data-id');
+
+  console.log('AÇÃO:', action, 'ID:', id);
+
   if (action === 'editCli') editCli2(id);
   else if (action === 'delCli') delCli(id);
   else if (action === 'editSvc') editSvc2(id);
