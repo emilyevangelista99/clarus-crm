@@ -557,7 +557,7 @@ function renderDash(){
   var pend=pagamentos.filter(function(p){return p.status==='pendente';});
   var late=pagamentos.filter(function(p){return isLate(p.vencimento,p.status);});
   var mes=thisMonth();
-  var recMes=pagamentos.filter(function(p){return p.status==='pago'&&(p.dataPag||'').slice(0,7)===mes;}).reduce(function(s,p){return s+parseFloat(p.valor||0);},0);
+var recMes=pagamentos.filter(function(p){return p.status==='pago'&&(p.data_pag||'').slice(0,7)===mes;}).reduce(function(s,p){return s+parseFloat(p.valor||0);},0);
   document.getElementById('dash-stats').innerHTML=
     '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Clientes ativos</div><div class="sv pu">'+ativos+'</div></div>'+
     '<div class="sc"><div class="sl"><svg class="ico" style="width:13px;height:13px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pendentes</div><div class="sv am">'+pend.length+'</div></div>'+
