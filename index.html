@@ -715,7 +715,30 @@ function editSvc2(id){
   editSvc=id;document.getElementById('svc-nome').value=s.nome;document.getElementById('svc-desc').value=s.desc||'';document.getElementById('svc-rec').value=s.rec;document.getElementById('svc-val').value=s.val||'';
   document.getElementById('mdl-svc-t').textContent='Editar serviço';openMdl('mdl-svc');
 }
-function delSvc(id){if(!confirm('Excluir este serviço?'))return;servicos=servicos.filter(function(s){return s.id!==id;});save();renderSvc();}
+async function delSvc(id){
+  if(!confirm('Excluir este serviço?')) return;
+
+  try {
+
+    const { error } = await supabaseClient
+      .from('servicos')
+      .delete()
+      .eq('id', id);
+
+    if(error) throw error;
+
+    servicos = servicos.filter(function(s){
+      return String(s.id) !== String(id);
+    });
+
+    renderSvc();
+    renderDash();
+
+  } catch(e) {
+    console.error('Erro ao excluir serviço:', e);
+    alert('Erro ao excluir serviço. Veja o console.');
+  }
+}
 
 // =========================================================
 // COBRANÇAS
