@@ -575,9 +575,11 @@ window.esqueciSenhaClarus = async function(){
 
   if (!email) return;
 
-const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-  redirectTo: window.location.origin + window.location.pathname + '?reset=true'
-});
+  await supabaseClient.auth.signOut();
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname + '?reset=true'
+  });
 
   if (error) {
     alert('Erro: ' + error.message);
