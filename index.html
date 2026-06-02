@@ -621,6 +621,42 @@ window.verificarSessaoClarus = async function(){
     window.esconderCRM();
   }
 };
+  window.salvarNovaSenhaClarus = async function(){
+  var senha = document.getElementById('nova-senha').value.trim();
+  var confirma = document.getElementById('confirma-nova-senha').value.trim();
+  var erro = document.getElementById('reset-error');
+
+  erro.textContent = '';
+
+  if(!senha || !confirma){
+    erro.textContent = 'Preencha os dois campos.';
+    return;
+  }
+
+  if(senha.length < 6){
+    erro.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+    return;
+  }
+
+  if(senha !== confirma){
+    erro.textContent = 'As senhas não conferem.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: senha
+  });
+
+  if(error){
+    erro.textContent = 'Erro ao atualizar senha.';
+    console.error('Erro ao atualizar senha:', error);
+    return;
+  }
+
+  alert('Senha atualizada com sucesso.');
+  window.mostrarCRM();
+  await load();
+};
 </script>
 
  <script>
