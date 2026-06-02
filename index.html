@@ -1238,6 +1238,17 @@ function initPagMdl(){
       return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';
     }).join('');
 
+  var diaSelect = document.getElementById('pag-dia');
+
+  if(diaSelect){
+    diaSelect.innerHTML =
+      '<option value="">Selecione o dia...</option>' +
+      Array.from({length:31}, function(_, i){
+        var dia = i + 1;
+        return '<option value="'+dia+'">'+dia+'</option>';
+      }).join('');
+  }
+
   document.getElementById('pag-svc').innerHTML =
     '<option value="">Selecione um cliente primeiro...</option>';
 
