@@ -735,8 +735,6 @@ window.verificarSessaoClarus = async function(){
     document.querySelectorAll('.topbar, .page').forEach(function(el){
       el.classList.add('app-hidden');
     });
-
-    return;
   }
 
   const { data:{ session } } = await supabaseClient.auth.getSession();
