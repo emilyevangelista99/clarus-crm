@@ -622,29 +622,8 @@ window.verificarSessaoClarus = async function(){
   }
 };
 </script>
-window.esqueciSenhaClarus = async function(){
 
-  const email = prompt('Digite seu e-mail de acesso:');
-
-  if (!email) return;
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin
-  });
-
-  if (error) {
-    alert('Erro: ' + error.message);
-    return;
-  }
-
-  alert('Enviamos um link de recuperação para seu e-mail.');
-};
-</script>
-
-// restante das funções
-function login() {
-
-}
+ <script>
 // =========================================================
 // AUTENTICAÇÃO — LOGIN CLARUS
 // =========================================================
