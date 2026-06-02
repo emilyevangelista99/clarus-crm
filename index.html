@@ -538,6 +538,90 @@ const supabaseClient = window.supabase.createClient(
 console.log('Supabase conectado!')
 </script>
 <script>
+window.loginClarus = async function(){
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+  var erro = document.getElementById('login-error');
+
+  erro.textContent = '';
+
+  if(!email || !password){
+    erro.textContent = 'Informe e-mail e senha.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if(error){
+    erro.textContent = 'E-mail ou senha inválidos.';
+    console.error('Erro no login:', error);
+    return;
+  }
+
+  window.mostrarCRM();
+  await load();
+};
+
+window.logoutClarus = async function(){
+  await supabaseClient.auth.signOut();
+  window.esconderCRM();
+};
+
+window.esqueciSenhaClarus = async function(){
+  const email = document.getElementById('login-email').value.trim() || prompt('Digite seu e-mail de acesso:');
+
+  if (!email) return;
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+
+  if (error) {
+    alert('Erro: ' + error.message);
+    return;
+  }
+
+  alert('Enviamos um link de recuperação para seu e-mail.');
+};
+
+window.esconderCRM = function(){
+  var login = document.getElementById('login-screen');
+  var reset = document.getElementById('reset-screen');
+
+  if(login) login.style.display = 'flex';
+  if(reset) reset.style.display = 'none';
+
+  document.querySelectorAll('.topbar, .page').forEach(function(el){
+    el.classList.add('app-hidden');
+  });
+};
+
+window.mostrarCRM = function(){
+  var login = document.getElementById('login-screen');
+  var reset = document.getElementById('reset-screen');
+
+  if(login) login.style.display = 'none';
+  if(reset) reset.style.display = 'none';
+
+  document.querySelectorAll('.topbar, .page').forEach(function(el){
+    el.classList.remove('app-hidden');
+  });
+};
+
+window.verificarSessaoClarus = async function(){
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+
+  if(session){
+    window.mostrarCRM();
+    await load();
+  }else{
+    window.esconderCRM();
+  }
+};
+</script>
 window.esqueciSenhaClarus = async function(){
 
   const email = prompt('Digite seu e-mail de acesso:');
