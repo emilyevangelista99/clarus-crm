@@ -1353,7 +1353,7 @@ var p=pagamentos.find(function(x){
 
   document.getElementById('recibo-body').innerHTML=
     '<div class="rwrap" id="rec-print">'+
-    '<div class="rhdr"><img class="rliimg" src="'+logoSrc+'" alt="CLARUS"></div>'+
+    '<div class="rhdr"><img class="rliimg" src=""+logoSrc+'" alt="CLARUS"></div>'+
     '<div class="rtitle">Recibo de Pagamento</div>'+
     rows+
     '<div class="rtot"><span>Valor recebido</span><span>'+fmtM(p.valor)+'</span></div>'+
