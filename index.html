@@ -1384,7 +1384,7 @@ function printRec(){
   var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+nomeArq.replace('.html','')+'</title>'
     +'<style>'+css+'</style></head><body>'
     +'<div class="rwrap">'+el.innerHTML+'</div>'
-    +'<script>window.onload=function(){window.print();};<\/script>'
++'<scr'+'ipt>window.onload=function(){window.print();};</scr'+'ipt>'
     +'</body></html>';
   var blob=new Blob([html],{type:'text/html;charset=utf-8'});
   var url=URL.createObjectURL(blob);
