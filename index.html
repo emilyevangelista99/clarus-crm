@@ -1232,32 +1232,45 @@ function selRT(tp){
   document.getElementById('pag-af').style.display=tp==='avulso'?'block':'none';
 }
 function initPagMdl(){
-  document.getElementById('pag-cli').innerHTML='<option value="">Selecione...</option>'+clientes.map(function(c){return'<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('');
-var cliId = document.getElementById('pag-cli').value;
-var cli = clientes.find(function(c){
-  return String(c.id) === String(cliId);
-});
+  document.getElementById('pag-cli').innerHTML =
+    '<option value="">Selecione...</option>' +
+    clientes.map(function(c){
+      return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';
+    }).join('');
 
-var servicosDoCliente = servicos;
+  document.getElementById('pag-svc').innerHTML =
+    '<option value="">Selecione um cliente primeiro...</option>';
 
-if(cli && cli.svcIds && cli.svcIds.length){
-  servicosDoCliente = servicos.filter(function(s){
-    return cli.svcIds.includes(String(s.id)) || cli.svcIds.includes(s.nome);
-  });
+  document.getElementById('pag-cli').onchange = function(){
+    atualizarServicosCobranca();
+  };
 }
 
-document.getElementById('pag-svc').innerHTML =
-  '<option value="">Selecione...</option>' +
-  servicosDoCliente.map(function(s){
-    return '<option value="'+s.id+'">'+s.nome+'</option>';
-  }).join('');
-  var ds=document.getElementById('pag-dia');
-  ds.innerHTML='<option value="">Dia...</option>'+Array.from({length:28},function(_,i){return'<option value="'+(i+1)+'">'+(i+1)+'</option>';}).join('');
-  document.getElementById('pag-mesi').value=thisMonth();
-  document.getElementById('pag-vav').value=today();
-  document.getElementById('pag-val').value='';
-  document.getElementById('pag-dav').value='';
-  updPrev();
+function atualizarServicosCobranca(){
+  var cliId = document.getElementById('pag-cli').value;
+  var cli = clientes.find(function(c){
+    return String(c.id) === String(cliId);
+  });
+
+  var lista = [];
+
+  if(cli && cli.svcIds && cli.svcIds.length){
+    lista = servicos.filter(function(s){
+      return cli.svcIds.includes(String(s.id)) || cli.svcIds.includes(s.nome);
+    });
+  }
+
+  if(!lista.length){
+    document.getElementById('pag-svc').innerHTML =
+      '<option value="">Nenhum serviço vinculado</option>';
+    return;
+  }
+
+  document.getElementById('pag-svc').innerHTML =
+    '<option value="">Selecione...</option>' +
+    lista.map(function(s){
+      return '<option value="'+s.id+'">'+esc(s.nome)+'</option>';
+    }).join('');
 }
 function onPagCli(){
   var cid=document.getElementById('pag-cli').value;
