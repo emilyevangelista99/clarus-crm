@@ -721,19 +721,33 @@ window.mostrarCRM = function(){
 };
 
 window.verificarSessaoClarus = async function(){
-  supabaseClient.auth.onAuthStateChange(function(event, session){
-    if(event === 'PASSWORD_RECOVERY'){
-      var login = document.getElementById('login-screen');
-      var reset = document.getElementById('reset-screen');
 
-      if(login) login.style.display = 'none';
-      if(reset) reset.style.display = 'flex';
+  const params = new URLSearchParams(window.location.search);
+  const isReset = params.get('reset') === 'true';
 
-      document.querySelectorAll('.topbar, .page').forEach(function(el){
-        el.classList.add('app-hidden');
-      });
-    }
-  });
+  if(isReset){
+    var login = document.getElementById('login-screen');
+    var reset = document.getElementById('reset-screen');
+
+    if(login) login.style.display = 'none';
+    if(reset) reset.style.display = 'flex';
+
+    document.querySelectorAll('.topbar, .page').forEach(function(el){
+      el.classList.add('app-hidden');
+    });
+
+    return;
+  }
+
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+
+  if(session){
+    window.mostrarCRM();
+    await load();
+  }else{
+    window.esconderCRM();
+  }
+};
 
   const hash = window.location.hash || '';
   const search = window.location.search || '';
