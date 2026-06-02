@@ -578,7 +578,7 @@ function login() {
 // AUTENTICAÇÃO — LOGIN CLARUS
 // =========================================================
 
-async function loginClarus(){
+window.loginClarus = async function(){
   var email = document.getElementById('login-email').value.trim();
   var password = document.getElementById('login-password').value.trim();
   var erro = document.getElementById('login-error');
@@ -601,43 +601,49 @@ async function loginClarus(){
     return;
   }
 
-  mostrarCRM();
+  window.mostrarCRM();
   await load();
-}
+};
 
-async function logoutClarus(){
+window.logoutClarus = async function(){
   await supabaseClient.auth.signOut();
-  esconderCRM();
-}
+  window.esconderCRM();
+};
 
-function esconderCRM(){
-  document.getElementById('login-screen').style.display = 'flex';
+window.esconderCRM = function(){
+  var login = document.getElementById('login-screen');
+  var reset = document.getElementById('reset-screen');
+
+  if(login) login.style.display = 'flex';
+  if(reset) reset.style.display = 'none';
 
   document.querySelectorAll('.topbar, .page').forEach(function(el){
     el.classList.add('app-hidden');
   });
-}
+};
 
-function mostrarCRM(){
-  document.getElementById('login-screen').style.display = 'none';
+window.mostrarCRM = function(){
+  var login = document.getElementById('login-screen');
+  var reset = document.getElementById('reset-screen');
+
+  if(login) login.style.display = 'none';
+  if(reset) reset.style.display = 'none';
 
   document.querySelectorAll('.topbar, .page').forEach(function(el){
     el.classList.remove('app-hidden');
   });
-}
+};
 
-async function verificarSessaoClarus(){
+window.verificarSessaoClarus = async function(){
   const { data:{ session } } = await supabaseClient.auth.getSession();
 
   if(session){
-    mostrarCRM();
+    window.mostrarCRM();
     await load();
   }else{
-    esconderCRM();
+    window.esconderCRM();
   }
-}
-</script>
-<script>
+};
 // =========================================================
 // DADOS
 // =========================================================
