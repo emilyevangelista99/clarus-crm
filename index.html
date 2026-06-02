@@ -685,6 +685,37 @@ window.mostrarCRM = function(){
 };
 
 window.verificarSessaoClarus = async function(){
+  supabaseClient.auth.onAuthStateChange(function(event, session){
+    if(event === 'PASSWORD_RECOVERY'){
+      var login = document.getElementById('login-screen');
+      var reset = document.getElementById('reset-screen');
+
+      if(login) login.style.display = 'none';
+      if(reset) reset.style.display = 'flex';
+
+      document.querySelectorAll('.topbar, .page').forEach(function(el){
+        el.classList.add('app-hidden');
+      });
+    }
+  });
+
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+
+  if(hash.indexOf('type=recovery') !== -1 || search.indexOf('type=recovery') !== -1){
+    var login = document.getElementById('login-screen');
+    var reset = document.getElementById('reset-screen');
+
+    if(login) login.style.display = 'none';
+    if(reset) reset.style.display = 'flex';
+
+    document.querySelectorAll('.topbar, .page').forEach(function(el){
+      el.classList.add('app-hidden');
+    });
+
+    return;
+  }
+
   const { data:{ session } } = await supabaseClient.auth.getSession();
 
   if(session){
