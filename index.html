@@ -170,7 +170,7 @@ svg.ico-lg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7
 
     <div id="login-error" class="login-error"></div>
 
-    <button class="btn-p" style="width:100%;justify-content:center;" onclick="loginClarus()">
+<button id="btn-login-clarus" class="btn-p" style="width:100%;justify-content:center;">
   Entrar
 </button>
 
@@ -1761,6 +1761,48 @@ window.saveSvc = async function saveSvc(){
 };
 document.addEventListener('DOMContentLoaded', function(){
   verificarSessaoClarus();
+});
+</script>
+    <script>
+window.loginClarus = async function(){
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+  var erro = document.getElementById('login-error');
+
+  erro.textContent = '';
+
+  if(!email || !password){
+    erro.textContent = 'Informe e-mail e senha.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if(error){
+    erro.textContent = 'E-mail ou senha inválidos.';
+    console.error('Erro no login:', error);
+    return;
+  }
+
+  if(typeof window.mostrarCRM === 'function'){
+    window.mostrarCRM();
+  }
+
+  if(typeof load === 'function'){
+    await load();
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('btn-login-clarus');
+  if(btn){
+    btn.addEventListener('click', function(){
+      window.loginClarus();
+    });
+  }
 });
 </script>
 </body>
