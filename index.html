@@ -1233,7 +1233,24 @@ function selRT(tp){
 }
 function initPagMdl(){
   document.getElementById('pag-cli').innerHTML='<option value="">Selecione...</option>'+clientes.map(function(c){return'<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('');
-  document.getElementById('pag-svc').innerHTML='<option value="">Selecione...</option>'+servicos.map(function(s){return'<option value="'+s.id+'">'+esc(s.nome)+'</option>';}).join('');
+var cliId = document.getElementById('pag-cli').value;
+var cli = clientes.find(function(c){
+  return String(c.id) === String(cliId);
+});
+
+var servicosDoCliente = servicos;
+
+if(cli && cli.svcIds && cli.svcIds.length){
+  servicosDoCliente = servicos.filter(function(s){
+    return cli.svcIds.includes(String(s.id)) || cli.svcIds.includes(s.nome);
+  });
+}
+
+document.getElementById('pag-svc').innerHTML =
+  '<option value="">Selecione...</option>' +
+  servicosDoCliente.map(function(s){
+    return '<option value="'+s.id+'">'+s.nome+'</option>';
+  }).join('');
   var ds=document.getElementById('pag-dia');
   ds.innerHTML='<option value="">Dia...</option>'+Array.from({length:28},function(_,i){return'<option value="'+(i+1)+'">'+(i+1)+'</option>';}).join('');
   document.getElementById('pag-mesi').value=thisMonth();
