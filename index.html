@@ -1249,7 +1249,15 @@ function mkBtnRecibo(pid, icoFi) {
   b.innerHTML = icoFi + ' Recibo';
   return b.outerHTML;
 }
-
+function mkBtnExcluirPag(pid) {
+  var b = document.createElement('button');
+  b.className = 'btn-s';
+  b.style.cssText = 'font-size:12px;padding:5px 10px;color:#A32D2D;border-color:rgba(163,45,45,0.3);';
+  b.setAttribute('data-action','delPag');
+  b.setAttribute('data-id', pid);
+  b.innerHTML = 'Excluir';
+  return b.outerHTML;
+}
 function renderPag(){
   var sf=document.getElementById('flt-pag-st')?document.getElementById('flt-pag-st').value:'';
   var cf=document.getElementById('flt-pag-cli')?document.getElementById('flt-pag-cli').value:'';
